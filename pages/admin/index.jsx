@@ -61,7 +61,7 @@ export default function AdminPanel() {
   const [authErr, setAuthErr] = useState('');
   const [tab, setTab] = useState('dashboard');
   const [toast, setToast] = useState(null);
-  const [data, setData] = useState({ products:[], enquiries:[], contacts:[], events:[], pages:[], gallery:[], stats:[], settings:{} });
+  const [data, setData] = useState({ products:[], enquiries:[], contacts:[], events:[], pages:[], gallery:[], celebrities:[], whyChoose:[], eventTypes:[], stats:[], settings:{} });
   const [loading, setLoading] = useState(false);
 
   const showToast = useCallback((message, type='success') => setToast({ message, type }), []);
@@ -74,13 +74,14 @@ export default function AdminPanel() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [pR,eR,cR,evR,pgR,gR,stR,setR] = await Promise.all([
+      const [pR,eR,cR,evR,pgR,gR,stR,setR,clR,wcR,etR] = await Promise.all([
         fetch('/api/products'), fetch('/api/enquiries'), fetch('/api/contact'),
         fetch('/api/events'), fetch('/api/admin/pages'), fetch('/api/gallery'),
-        fetch('/api/stats'), fetch('/api/settings'),
+        fetch('/api/stats'), fetch('/api/settings'), fetch('/api/celebrities'),
+        fetch('/api/why-choose'), fetch('/api/event-types'),
       ]);
-      const [p,e,c,ev,pg,g,st,set] = await Promise.all([pR.json(),eR.json(),cR.json(),evR.json(),pgR.json(),gR.json(),stR.json(),setR.json()]);
-      setData({ products:p.data||[], enquiries:e.data||[], contacts:c.data||[], events:ev.data||[], pages:pg.data||[], gallery:g.data||[], stats:st.data||[], settings:set.data||{} });
+      const [p,e,c,ev,pg,g,st,set,cl,wc,et] = await Promise.all([pR.json(),eR.json(),cR.json(),evR.json(),pgR.json(),gR.json(),stR.json(),setR.json(),clR.json(),wcR.json(),etR.json()]);
+      setData({ products:p.data||[], enquiries:e.data||[], contacts:c.data||[], events:ev.data||[], pages:pg.data||[], gallery:g.data||[], celebrities:cl.data||[], whyChoose:wc.data||[], eventTypes:et.data||[], stats:st.data||[], settings:set.data||{} });
     } catch { showToast('Failed to fetch data','error'); }
     setLoading(false);
   }, [showToast]);
@@ -120,6 +121,9 @@ export default function AdminPanel() {
     { id:'products',  label:'🎛️ Products' },
     { id:'events',    label:'🎵 Events' },
     { id:'gallery',   label:'🖼️ Gallery' },
+    { id:'celebrities', label:'🌟 Celebrities' },
+    { id:'whychoose', label:'✅ Why Choose Us' },
+    { id:'eventtypes', label:'🎪 Event Types' },
     { id:'enquiries', label:`📩 Enquiries${newEnq?` (${newEnq})`:''}` },
     { id:'contacts',  label:`📧 Contacts${newCon?` (${newCon})`:''}` },
     { id:'pages',     label:'📄 CMS Pages' },
@@ -175,6 +179,9 @@ export default function AdminPanel() {
             {tab==='products'  && <ProductsTab products={data.products} refresh={fetchAll} showToast={showToast} />}
             {tab==='events'    && <EventsTab events={data.events} refresh={fetchAll} showToast={showToast} />}
             {tab==='gallery'   && <GalleryTab images={data.gallery} refresh={fetchAll} showToast={showToast} />}
+            {tab==='celebrities' && <CelebritiesTab celebrities={data.celebrities} refresh={fetchAll} showToast={showToast} />}
+            {tab==='whychoose' && <WhyChooseTab items={data.whyChoose} refresh={fetchAll} showToast={showToast} />}
+            {tab==='eventtypes' && <EventTypesTab items={data.eventTypes} refresh={fetchAll} showToast={showToast} />}
             {tab==='enquiries' && <EnquiriesTab enquiries={data.enquiries} refresh={fetchAll} showToast={showToast} />}
             {tab==='contacts'  && <ContactsTab contacts={data.contacts} refresh={fetchAll} showToast={showToast} />}
             {tab==='pages'     && <PagesTab pages={data.pages} refresh={fetchAll} showToast={showToast} />}
@@ -216,6 +223,9 @@ function DashTab({ data, switchTab }) {
     { label:'Products', value:data.products.length, icon:'🎛️', color:'#2563EB', tab:'products' },
     { label:'Events', value:data.events.length, icon:'🎵', color:'#7C3AED', tab:'events' },
     { label:'Gallery', value:data.gallery.length, icon:'🖼️', color:'#059669', tab:'gallery' },
+    { label:'Celebrities', value:data.celebrities.length, icon:'🌟', color:'#DB2777', tab:'celebrities' },
+    { label:'Why Choose Cards', value:data.whyChoose.length, icon:'✅', color:'#0EA5E9', tab:'whychoose' },
+    { label:'Event Types', value:data.eventTypes.length, icon:'🎪', color:'#65A30D', tab:'eventtypes' },
     { label:'Enquiries', value:data.enquiries.length, icon:'📩', color:'#D97706', tab:'enquiries', new:data.enquiries.filter(e=>e.status==='new').length },
     { label:'Contacts', value:data.contacts.length, icon:'📧', color:'#E94560', tab:'contacts', new:data.contacts.filter(c=>c.status==='new').length },
     { label:'CMS Pages', value:data.pages.length, icon:'📄', color:'#0891B2', tab:'pages' },
@@ -586,7 +596,210 @@ function GalleryTab({ images, refresh, showToast }) {
   );
 }
 
-// ── Enquiries Tab ─────────────────────────────────────────
+// ── Celebrities Tab (Home Page "Celebrities We've Worked With") ──
+function CelebritiesTab({ celebrities, refresh, showToast }) {
+  const empty = { name:'', designation:'', image:'', order:0, visible:true };
+  const [form, setForm] = useState(empty);
+  const [editing, setEditing] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+
+  const sorted = [...celebrities].sort((a,b)=>(a.order||0)-(b.order||0));
+
+  const save = async () => {
+    if (!form.name.trim()) { showToast('Please enter a name','error'); return; }
+    if (!form.image.trim()) { showToast('Please upload a photo','error'); return; }
+    const url = editing ? `/api/celebrities/${editing}` : '/api/celebrities';
+    const res = await fetch(url, { method: editing?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(form) });
+    if (res.ok) { showToast(editing?'Updated!':'Added!'); setForm(empty); setEditing(null); setShowForm(false); refresh(); }
+    else showToast('Error saving','error');
+  };
+  const del = async id => { if(!confirm('Remove this celebrity?'))return; await fetch(`/api/celebrities/${id}`,{method:'DELETE'}); showToast('Removed'); refresh(); };
+  const edit = c => { setForm({ name:c.name, designation:c.designation||'', image:c.image, order:c.order||0, visible:c.visible!==false }); setEditing(c._id); setShowForm(true); window.scrollTo({top:0,behavior:'smooth'}); };
+  const toggleVisible = async c => { await fetch(`/api/celebrities/${c._id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({visible:!c.visible})}); refresh(); };
+
+  return (
+    <div>
+      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8, flexWrap:'wrap', gap:10 }}>
+        <h2 style={{ fontWeight:700, fontSize:'1rem' }}>Celebrities ({celebrities.length})</h2>
+        <button onClick={()=>{setShowForm(!showForm);setEditing(null);setForm(empty)}} style={addBtnSt}>{showForm?'Cancel':'+ Add Celebrity'}</button>
+      </div>
+      <p style={{ fontSize:'0.82rem', color:'#888', marginBottom:16 }}>These show up in the &quot;Celebrities We&apos;ve Worked With&quot; section on the home page. Use Order to control left-to-right position; hide instead of delete to keep history.</p>
+
+      {showForm && (
+        <FormCard title={editing?'Edit Celebrity':'Add Celebrity'}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div style={{ gridColumn:'1/-1' }}>
+              <ImageUploader label="Photo" value={form.image} onChange={v=>setForm(f=>({...f,image:v}))} folder="celebrities" showToast={showToast} />
+            </div>
+            <AF label="Name" value={form.name} onChange={v=>setForm(f=>({...f,name:v}))} placeholder="e.g. Diljit Dosanjh" />
+            <AF label="Designation / Note" value={form.designation} onChange={v=>setForm(f=>({...f,designation:v}))} placeholder="e.g. Singer & Actor" />
+            <AF label="Display Order" type="number" value={form.order} onChange={v=>setForm(f=>({...f,order:Number(v)||0}))} placeholder="0" />
+            <div style={{ display:'flex', alignItems:'center' }}>
+              <CbField label="Visible on Home Page" checked={form.visible} onChange={v=>setForm(f=>({...f,visible:v}))} />
+            </div>
+          </div>
+          <SaveBtn onClick={save} label={editing?'Update Celebrity':'Add Celebrity'} />
+        </FormCard>
+      )}
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))', gap:14 }}>
+        {sorted.map(c=>(
+          <div key={c._id} style={{ borderRadius:10, overflow:'hidden', border:'1px solid #E8E4D9', background:'#fff', opacity:c.visible===false?0.5:1 }}>
+            <img src={c.image} alt={c.name} style={{ width:'100%', height:150, objectFit:'cover', display:'block' }} loading="lazy" onError={e=>{e.target.src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect fill="%23F3F0EA" width="150" height="150"/><text x="50%25" y="50%25" text-anchor="middle" fill="%23888" font-size="12">No Photo</text></svg>'}} />
+            <div style={{ padding:'10px 12px' }}>
+              <p style={{ fontSize:'0.84rem', fontWeight:700, color:'#1A1A2E', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{c.name}</p>
+              {c.designation && <p style={{ fontSize:'0.74rem', color:'#888', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{c.designation}</p>}
+              <p style={{ fontSize:'0.7rem', color:'#D4AF37', fontWeight:700, marginTop:4 }}>{c.visible===false?'Hidden':'Visible'} · Order {c.order||0}</p>
+              <div style={{ display:'flex', gap:6, marginTop:8, flexWrap:'wrap' }}>
+                <Btn color="#2563EB" onClick={()=>edit(c)} sm>Edit</Btn>
+                <Btn color={c.visible===false?'#059669':'#D97706'} onClick={()=>toggleVisible(c)} sm>{c.visible===false?'Show':'Hide'}</Btn>
+                <Btn color="#E74C3C" onClick={()=>del(c._id)} sm>Del</Btn>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {sorted.length===0 && <Empty text="No celebrities added yet. Add one above to show this section on the home page." />}
+    </div>
+  );
+}
+
+
+// ── Why Choose Us Tab (Home Page "The Pro Audio Advantage" cards) ──
+function WhyChooseTab({ items, refresh, showToast }) {
+  const empty = { title:'', desc:'', image:'', order:0, visible:true };
+  const [form, setForm] = useState(empty);
+  const [editing, setEditing] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+
+  const sorted = [...items].sort((a,b)=>(a.order||0)-(b.order||0));
+
+  const save = async () => {
+    if (!form.title.trim()) { showToast('Please enter a title','error'); return; }
+    if (!form.image.trim()) { showToast('Please upload an image','error'); return; }
+    const url = editing ? `/api/why-choose/${editing}` : '/api/why-choose';
+    const res = await fetch(url, { method: editing?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(form) });
+    if (res.ok) { showToast(editing?'Updated!':'Added!'); setForm(empty); setEditing(null); setShowForm(false); refresh(); }
+    else showToast('Error saving','error');
+  };
+  const del = async id => { if(!confirm('Remove this card?'))return; await fetch(`/api/why-choose/${id}`,{method:'DELETE'}); showToast('Removed'); refresh(); };
+  const edit = it => { setForm({ title:it.title, desc:it.desc||'', image:it.image, order:it.order||0, visible:it.visible!==false }); setEditing(it._id); setShowForm(true); window.scrollTo({top:0,behavior:'smooth'}); };
+  const toggleVisible = async it => { await fetch(`/api/why-choose/${it._id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({visible:!it.visible})}); refresh(); };
+
+  return (
+    <div>
+      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8, flexWrap:'wrap', gap:10 }}>
+        <h2 style={{ fontWeight:700, fontSize:'1rem' }}>Why Choose Us Cards ({items.length})</h2>
+        <button onClick={()=>{setShowForm(!showForm);setEditing(null);setForm(empty)}} style={addBtnSt}>{showForm?'Cancel':'+ Add Card'}</button>
+      </div>
+      <p style={{ fontSize:'0.82rem', color:'#888', marginBottom:16 }}>These power the &quot;The Pro Audio Advantage&quot; section on the home page. Add at least one card with an image — until then the site shows default sample cards.</p>
+
+      {showForm && (
+        <FormCard title={editing?'Edit Card':'Add Card'}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div style={{ gridColumn:'1/-1' }}>
+              <ImageUploader label="Image" value={form.image} onChange={v=>setForm(f=>({...f,image:v}))} folder="why-choose" showToast={showToast} />
+            </div>
+            <AF label="Title" value={form.title} onChange={v=>setForm(f=>({...f,title:v}))} placeholder="e.g. 24x7 Expert Team" />
+            <AF label="Display Order" type="number" value={form.order} onChange={v=>setForm(f=>({...f,order:Number(v)||0}))} placeholder="0" />
+            <AF label="Description" type="textarea" span value={form.desc} onChange={v=>setForm(f=>({...f,desc:v}))} placeholder="Short description shown under the title" />
+            <div style={{ display:'flex', alignItems:'center' }}>
+              <CbField label="Visible on Home Page" checked={form.visible} onChange={v=>setForm(f=>({...f,visible:v}))} />
+            </div>
+          </div>
+          <SaveBtn onClick={save} label={editing?'Update Card':'Add Card'} />
+        </FormCard>
+      )}
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:14 }}>
+        {sorted.map(it=>(
+          <div key={it._id} style={{ borderRadius:10, overflow:'hidden', border:'1px solid #E8E4D9', background:'#fff', opacity:it.visible===false?0.5:1 }}>
+            <img src={it.image} alt={it.title} style={{ width:'100%', height:110, objectFit:'cover', display:'block' }} loading="lazy" onError={e=>{e.target.src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="110"><rect fill="%23F3F0EA" width="220" height="110"/><text x="50%25" y="50%25" text-anchor="middle" fill="%23888" font-size="12">No Image</text></svg>'}} />
+            <div style={{ padding:'10px 12px' }}>
+              <p style={{ fontSize:'0.86rem', fontWeight:700, color:'#1A1A2E' }}>{it.title}</p>
+              {it.desc && <p style={{ fontSize:'0.76rem', color:'#888', marginTop:2, overflow:'hidden', textOverflow:'ellipsis', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{it.desc}</p>}
+              <p style={{ fontSize:'0.7rem', color:'#D4AF37', fontWeight:700, marginTop:6 }}>{it.visible===false?'Hidden':'Visible'} · Order {it.order||0}</p>
+              <div style={{ display:'flex', gap:6, marginTop:8, flexWrap:'wrap' }}>
+                <Btn color="#2563EB" onClick={()=>edit(it)} sm>Edit</Btn>
+                <Btn color={it.visible===false?'#059669':'#D97706'} onClick={()=>toggleVisible(it)} sm>{it.visible===false?'Show':'Hide'}</Btn>
+                <Btn color="#E74C3C" onClick={()=>del(it._id)} sm>Del</Btn>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {sorted.length===0 && <Empty text="No cards added yet. Default sample cards are shown on the site until you add your own." />}
+    </div>
+  );
+}
+
+// ── Event Types Tab (Home Page "Events We Power" cards) ──
+function EventTypesTab({ items, refresh, showToast }) {
+  const empty = { title:'', image:'', order:0, visible:true };
+  const [form, setForm] = useState(empty);
+  const [editing, setEditing] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+
+  const sorted = [...items].sort((a,b)=>(a.order||0)-(b.order||0));
+
+  const save = async () => {
+    if (!form.title.trim()) { showToast('Please enter a title','error'); return; }
+    if (!form.image.trim()) { showToast('Please upload an image','error'); return; }
+    const url = editing ? `/api/event-types/${editing}` : '/api/event-types';
+    const res = await fetch(url, { method: editing?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(form) });
+    if (res.ok) { showToast(editing?'Updated!':'Added!'); setForm(empty); setEditing(null); setShowForm(false); refresh(); }
+    else showToast('Error saving','error');
+  };
+  const del = async id => { if(!confirm('Remove this event type?'))return; await fetch(`/api/event-types/${id}`,{method:'DELETE'}); showToast('Removed'); refresh(); };
+  const edit = it => { setForm({ title:it.title, image:it.image, order:it.order||0, visible:it.visible!==false }); setEditing(it._id); setShowForm(true); window.scrollTo({top:0,behavior:'smooth'}); };
+  const toggleVisible = async it => { await fetch(`/api/event-types/${it._id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({visible:!it.visible})}); refresh(); };
+
+  return (
+    <div>
+      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8, flexWrap:'wrap', gap:10 }}>
+        <h2 style={{ fontWeight:700, fontSize:'1rem' }}>Event Type Cards ({items.length})</h2>
+        <button onClick={()=>{setShowForm(!showForm);setEditing(null);setForm(empty)}} style={addBtnSt}>{showForm?'Cancel':'+ Add Event Type'}</button>
+      </div>
+      <p style={{ fontSize:'0.82rem', color:'#888', marginBottom:16 }}>These power the &quot;Events We Power&quot; image-card section on the home page (Weddings, Corporate, Concerts, etc).</p>
+
+      {showForm && (
+        <FormCard title={editing?'Edit Event Type':'Add Event Type'}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div style={{ gridColumn:'1/-1' }}>
+              <ImageUploader label="Image" value={form.image} onChange={v=>setForm(f=>({...f,image:v}))} folder="event-types" showToast={showToast} />
+            </div>
+            <AF label="Title" value={form.title} onChange={v=>setForm(f=>({...f,title:v}))} placeholder="e.g. Weddings & Sangeet" />
+            <AF label="Display Order" type="number" value={form.order} onChange={v=>setForm(f=>({...f,order:Number(v)||0}))} placeholder="0" />
+            <div style={{ display:'flex', alignItems:'center' }}>
+              <CbField label="Visible on Home Page" checked={form.visible} onChange={v=>setForm(f=>({...f,visible:v}))} />
+            </div>
+          </div>
+          <SaveBtn onClick={save} label={editing?'Update':'Add Event Type'} />
+        </FormCard>
+      )}
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(180px,1fr))', gap:14 }}>
+        {sorted.map(it=>(
+          <div key={it._id} style={{ borderRadius:10, overflow:'hidden', border:'1px solid #E8E4D9', background:'#fff', opacity:it.visible===false?0.5:1 }}>
+            <img src={it.image} alt={it.title} style={{ width:'100%', height:110, objectFit:'cover', display:'block' }} loading="lazy" onError={e=>{e.target.src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="110"><rect fill="%23F3F0EA" width="180" height="110"/><text x="50%25" y="50%25" text-anchor="middle" fill="%23888" font-size="12">No Image</text></svg>'}} />
+            <div style={{ padding:'10px 12px' }}>
+              <p style={{ fontSize:'0.86rem', fontWeight:700, color:'#1A1A2E' }}>{it.title}</p>
+              <p style={{ fontSize:'0.7rem', color:'#D4AF37', fontWeight:700, marginTop:6 }}>{it.visible===false?'Hidden':'Visible'} · Order {it.order||0}</p>
+              <div style={{ display:'flex', gap:6, marginTop:8, flexWrap:'wrap' }}>
+                <Btn color="#2563EB" onClick={()=>edit(it)} sm>Edit</Btn>
+                <Btn color={it.visible===false?'#059669':'#D97706'} onClick={()=>toggleVisible(it)} sm>{it.visible===false?'Show':'Hide'}</Btn>
+                <Btn color="#E74C3C" onClick={()=>del(it._id)} sm>Del</Btn>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {sorted.length===0 && <Empty text="No event types added yet. Default sample types are shown on the site until you add your own." />}
+    </div>
+  );
+}
+
+
 function EnquiriesTab({ enquiries, refresh, showToast }) {
   const [expanded, setExpanded] = useState(null);
   const [page, setPage] = useState(1);

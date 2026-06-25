@@ -10,7 +10,7 @@ import HeroSection from '../components/HeroSection';
 
 const CAT_ICONS = { 'Sound Systems': '🔊', 'Mixing Consoles': '🎛️', 'Microphones': '🎤', 'Lighting': '💡', 'Trussing & Structures': '🏗️', 'LED Walls': '📺' };
 
-export default function Home({ featuredProducts, upcomingEvents, site, footerPages, stats }) {
+export default function Home({ featuredProducts, upcomingEvents, collageEvents, site, footerPages, stats, celebrities, whyChoose, eventTypes }) {
   const s = site || {};
   const phones = [s.phone1, s.phone2, s.phone3].filter(Boolean);
   const heroHeading = s.heroHeading || 'Premium Sound & Lighting Solutions For Every Event';
@@ -21,6 +21,9 @@ export default function Home({ featuredProducts, upcomingEvents, site, footerPag
     { label: 'Availability', value: '24×7', icon: '⏰' },
     { label: 'Premium Brands', value: '50+', icon: '🏆' },
   ];
+  const FALLBACK_IMG = 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600';
+  const displayWhyChoose = whyChoose && whyChoose.length > 0 ? whyChoose : WHY_CHOOSE.map(w => ({ ...w, image: FALLBACK_IMG }));
+  const displayEventTypes = eventTypes && eventTypes.length > 0 ? eventTypes : CLIENTS_TYPES.map(t => ({ title: t, image: FALLBACK_IMG }));
 
   const [productPopup, setProductPopup] = useState(null);
 
@@ -39,21 +42,67 @@ export default function Home({ featuredProducts, upcomingEvents, site, footerPag
             <p className="section-subtitle">Expert engineers, premium equipment, and unmatched reliability — every event, every time.</p>
           </div>
           <div className="grid-3">
-            {WHY_CHOOSE.map(item => (
-              <div key={item.title} style={{ background: 'var(--color-white)', borderRadius: 'var(--radius-lg)', padding: 28, border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)' }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-gold)'; e.currentTarget.style.transform = 'translateY(-4px)' }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; e.currentTarget.style.transform = 'none' }}
-              >
-                <div style={{ fontSize: '2rem', marginBottom: 14 }}>{item.icon}</div>
-                <h3 style={{ fontWeight: 700, fontSize: '1.05rem', marginBottom: 8 }}>{item.title}</h3>
-                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-light)', lineHeight: 1.65 }}>{item.desc}</p>
+            {displayWhyChoose.map(item => (
+              <div key={item._id || item.title} className="why-card">
+                <div className="why-card-img">
+                  <img src={item.image} alt={item.title} loading="lazy" />
+                </div>
+                <div className="why-card-body">
+                  <h3 style={{ fontWeight: 700, fontSize: '1.05rem', marginBottom: 8 }}>{item.title}</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--color-text-light)', lineHeight: 1.65 }}>{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
+        <style>{`
+          .why-card {
+            background: var(--color-white); border-radius: var(--radius-lg); overflow: hidden;
+            border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); transition: var(--transition);
+          }
+          .why-card:hover { box-shadow: var(--shadow-gold); transform: translateY(-4px); }
+          .why-card-img { height: 170px; overflow: hidden; }
+          .why-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: var(--transition); }
+          .why-card:hover .why-card-img img { transform: scale(1.06); }
+          .why-card-body { padding: 22px; }
+        `}</style>
       </section>
 
-      {/* FEATURED PRODUCTS */}
+
+      {/* CELEBRITIES */}
+      {celebrities && celebrities.length > 0 && (
+        <section className="section-pad" style={{ background: 'linear-gradient(180deg, var(--color-secondary) 0%, var(--color-secondary-light) 100%)', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'radial-gradient(circle at 20% 20%, var(--color-primary) 0%, transparent 35%), radial-gradient(circle at 80% 80%, var(--color-primary) 0%, transparent 35%)' }} />
+          <div className="container" style={{ position: 'relative' }}>
+            <div className="section-header center">
+              <div className="badge" style={{ background: 'rgba(212,175,55,0.15)', borderColor: 'rgba(212,175,55,0.4)', color: 'var(--color-primary)' }}>Star Power</div>
+              <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Celebrities We&apos;ve Worked With</h2>
+              <div className="gold-divider" />
+              <p className="section-subtitle" style={{ color: 'rgba(255,255,255,0.65)', margin: '0 auto' }}>Trusted by top artists and performers for sound, lighting & production that never misses a beat.</p>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 28 }}>
+              {celebrities.map(c => (
+                <div key={c._id} style={{ width: 160, textAlign: 'center' }}>
+                  <div style={{
+                    width: 130, height: 130, borderRadius: '50%', margin: '0 auto 14px', padding: 3,
+                    background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-light))',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.35)', transition: 'var(--transition)',
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px) scale(1.04)' }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
+                  >
+                    <img src={c.image} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', border: '3px solid var(--color-secondary)', display: 'block' }} loading="lazy" />
+                  </div>
+                  <h3 style={{ color: 'var(--color-white)', fontWeight: 700, fontSize: '0.95rem', marginBottom: 2 }}>{c.name}</h3>
+                  {c.designation && <p style={{ color: 'var(--color-primary)', fontSize: '0.78rem', fontWeight: 600 }}>{c.designation}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+
       <section className="section-pad">
         <div className="container">
           <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
@@ -126,7 +175,84 @@ export default function Home({ featuredProducts, upcomingEvents, site, footerPag
         </section>
       )}
 
-      {/* EVENT TYPES */}
+      {/* EVENT COLLAGE / HIGHLIGHTS */}
+      {collageEvents && collageEvents.length > 0 && (
+        <section className="section-pad bg-alt">
+          <div className="container">
+            <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
+              <div>
+                <div className="badge">Behind The Scenes</div>
+                <h2 className="section-title">Event Highlights</h2>
+                <div className="gold-divider" />
+                <p className="section-subtitle">A glimpse from the stages, weddings & shows we&apos;ve powered recently.</p>
+              </div>
+              <Link href="/events" className="btn btn-outline-gold">All Events →</Link>
+            </div>
+            <div className="collage-grid">
+              {collageEvents.flatMap(ev => {
+                const imgs = (ev.images && ev.images.length ? ev.images : ev.image ? [ev.image] : []).slice(0, 2);
+                return imgs.map((src, i) => ({ src, title: ev.title, category: ev.category, slug: ev.slug || ev._id, key: `${ev._id}-${i}` }));
+              }).slice(0, 8).map((tile, idx) => (
+                <Link href={`/events/${tile.slug}`} key={tile.key} className={`collage-tile ${idx % 5 === 0 ? 'collage-tile-big' : ''}`}>
+                  <img src={tile.src} alt={tile.title} loading="lazy" />
+                  <div className="collage-overlay">
+                    <span className="collage-cat">{tile.category}</span>
+                    <span className="collage-title">{tile.title}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <style>{`
+            .collage-grid {
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              grid-auto-rows: 160px;
+              gap: 12px;
+            }
+            .collage-tile {
+              position: relative;
+              display: block;
+              overflow: hidden;
+              border-radius: var(--radius-md);
+              grid-column: span 1;
+              grid-row: span 1;
+            }
+            .collage-tile-big {
+              grid-column: span 2;
+              grid-row: span 2;
+            }
+            .collage-tile img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              display: block;
+              transition: var(--transition);
+            }
+            .collage-tile:hover img { transform: scale(1.07); }
+            .collage-overlay {
+              position: absolute; inset: 0;
+              background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.75) 100%);
+              display: flex; flex-direction: column; justify-content: flex-end;
+              padding: 12px; opacity: 0; transition: var(--transition);
+            }
+            .collage-tile:hover .collage-overlay { opacity: 1; }
+            .collage-cat {
+              color: var(--color-primary); font-size: 0.68rem; font-weight: 800;
+              text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px;
+            }
+            .collage-title {
+              color: #fff; font-weight: 700; font-size: 0.85rem; line-height: 1.3;
+            }
+            @media (max-width: 768px) {
+              .collage-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 130px; }
+              .collage-tile-big { grid-column: span 2; grid-row: span 1; }
+            }
+          `}</style>
+        </section>
+      )}
+
+
       <section className="section-pad">
         <div className="container">
           <div className="section-header center">
@@ -135,12 +261,37 @@ export default function Home({ featuredProducts, upcomingEvents, site, footerPag
             <div className="gold-divider" />
             <p className="section-subtitle">From intimate gatherings to massive stadium concerts — we&apos;ve done it all.</p>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
-            {CLIENTS_TYPES.map(c => (
-              <span key={c} style={{ padding: '10px 20px', borderRadius: 100, border: '1.5px solid var(--color-border)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text)', background: 'var(--color-white)', cursor: 'default' }}>{c}</span>
+          <div className="events-power-grid">
+            {displayEventTypes.map(et => (
+              <div key={et._id || et.title} className="events-power-card">
+                <img src={et.image} alt={et.title} loading="lazy" />
+                <div className="events-power-overlay">
+                  <span>{et.title}</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
+        <style>{`
+          .events-power-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+          }
+          .events-power-card {
+            position: relative; border-radius: var(--radius-md); overflow: hidden;
+            height: 150px; box-shadow: var(--shadow-sm); transition: var(--transition);
+          }
+          .events-power-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+          .events-power-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: var(--transition); }
+          .events-power-card:hover img { transform: scale(1.08); }
+          .events-power-overlay {
+            position: absolute; inset: 0; display: flex; align-items: flex-end;
+            background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.72) 100%);
+            padding: 12px;
+          }
+          .events-power-overlay span { color: #fff; font-weight: 700; font-size: 0.9rem; line-height: 1.25; }
+          @media (max-width: 900px) { .events-power-grid { grid-template-columns: repeat(3, 1fr); } }
+          @media (max-width: 600px) { .events-power-grid { grid-template-columns: repeat(2, 1fr); } }
+        `}</style>
       </section>
 
       {/* CTA / ENQUIRY */}
@@ -223,10 +374,19 @@ export async function getServerSideProps() {
   try {
     const common = await getCommonProps();
     await connectDB();
-    const [featuredProducts, upcomingEvents] = await Promise.all([
+    const [featuredProducts, upcomingEvents, collageEventsRaw] = await Promise.all([
       Product.find({ featured: true }).limit(6).lean(),
       Event.find({ isUpcoming: true, date: { $gte: new Date() } }).sort({ date: 1 }).limit(3).lean(),
+      Event.find({ $or: [{ image: { $exists: true, $ne: '' } }, { 'images.0': { $exists: true } }] })
+        .sort({ date: -1 }).limit(8).select('title slug category images image').lean(),
     ]);
-    return { props: { ...common, featuredProducts: JSON.parse(JSON.stringify(featuredProducts)), upcomingEvents: JSON.parse(JSON.stringify(upcomingEvents)) } };
-  } catch { return { props: { featuredProducts: [], upcomingEvents: [], site: {}, footerPages: [], stats: [] } }; }
+    return {
+      props: {
+        ...common,
+        featuredProducts: JSON.parse(JSON.stringify(featuredProducts)),
+        upcomingEvents: JSON.parse(JSON.stringify(upcomingEvents)),
+        collageEvents: JSON.parse(JSON.stringify(collageEventsRaw)),
+      },
+    };
+  } catch { return { props: { featuredProducts: [], upcomingEvents: [], collageEvents: [], site: {}, footerPages: [], stats: [], celebrities: [], whyChoose: [], eventTypes: [] } }; }
 }

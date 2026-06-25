@@ -1,6 +1,8 @@
 # Pro Audio Solution — Complete Website
 
 Full-stack Next.js website for **Pro Audio Solution**, Delhi — Premium Light & Sound Company.
+db_user2
+cMySC23t9Ifu8bmm
 
 ## 🚀 Tech Stack
 - **Frontend + Backend**: Next.js 14, JSX (no TypeScript), Pages Router

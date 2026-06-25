@@ -1,5 +1,5 @@
-import { connectDB, Product, Event, GalleryImage, Page, Settings, Stat } from '../../../lib/db';
-import { PRODUCTS_SEED, GALLERY_SEED, POLICY_PAGES_SEED, EVENTS_SEED, SETTINGS_SEED, STATS_SEED } from '../../../lib/siteData';
+import { connectDB, Product, Event, GalleryImage, Page, Settings, Stat, WhyChoose, EventType } from '../../../lib/db';
+import { PRODUCTS_SEED, GALLERY_SEED, POLICY_PAGES_SEED, EVENTS_SEED, SETTINGS_SEED, STATS_SEED, WHY_CHOOSE_SEED, EVENT_TYPES_SEED } from '../../../lib/siteData';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -47,6 +47,20 @@ export default async function handler(req, res) {
     await Stat.findOneAndUpdate({ key: s.key }, s, { upsert: true, new: true });
   }
   results.stats = `Upserted ${STATS_SEED.length} stats`;
+
+  // Why Choose Us cards
+  const wcCount = await WhyChoose.countDocuments();
+  if (wcCount === 0) {
+    await WhyChoose.insertMany(WHY_CHOOSE_SEED);
+    results.whyChoose = `Seeded ${WHY_CHOOSE_SEED.length}`;
+  } else results.whyChoose = `Skipped (${wcCount} exist)`;
+
+  // Event Type cards
+  const etCount = await EventType.countDocuments();
+  if (etCount === 0) {
+    await EventType.insertMany(EVENT_TYPES_SEED);
+    results.eventTypes = `Seeded ${EVENT_TYPES_SEED.length}`;
+  } else results.eventTypes = `Skipped (${etCount} exist)`;
 
   return res.json({ success: true, results });
 }

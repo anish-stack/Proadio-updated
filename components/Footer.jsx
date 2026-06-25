@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import { Facebook, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
 import PopupModal from './PopupModal';
+
+function WhatsAppIcon({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.149-.15.347-.39.521-.585.174-.198.232-.297.348-.495.116-.198.06-.372-.04-.522-.099-.149-.643-1.553-.886-2.149-.18-.434-.36-.385-.499-.392-.137-.006-.296-.007-.456-.007-.156 0-.41.06-.628.296-.219.235-.836.815-.836 1.99 0 1.176.86 2.312.978 2.479.118.166 1.626 2.494 3.99 3.402 1.978.755 2.378.604 2.81.563.43-.04 1.39-.566 1.586-1.115.196-.55.196-1.018.137-1.116-.058-.099-.297-.149-.594-.298z" />
+      <path d="M12.04 2C6.477 2 2 6.477 2 12.04c0 1.96.554 3.787 1.516 5.347L2 22l4.74-1.484A9.93 9.93 0 0012.04 22c5.563 0 10.04-4.477 10.04-10.04C22.08 6.477 17.603 2 12.04 2zm0 18.18a8.1 8.1 0 01-4.378-1.279l-.314-.197-3.103.972.99-3.027-.205-.31A8.13 8.13 0 0112.04 3.86c4.51 0 8.18 3.67 8.18 8.18 0 4.51-3.67 8.14-8.18 8.14z" />
+    </svg>
+  );
+}
 
 export default function Footer({ site, footerPages }) {
   const s = site || {};
@@ -60,10 +70,10 @@ export default function Footer({ site, footerPages }) {
               </p>
               {/* Social */}
               <div style={{ display: 'flex', gap: 10 }}>
-                {s.facebook && <SocialLink href={s.facebook} label="FB" />}
-                {s.instagram && <SocialLink href={s.instagram} label="IG" />}
-                {s.youtube && <SocialLink href={s.youtube} label="YT" />}
-                {s.whatsapp && <SocialLink href={`https://wa.me/${s.whatsapp}`} label="WA" />}
+                {s.facebook && <SocialLink href={s.facebook} icon={<Facebook size={16} />} />}
+                {s.instagram && <SocialLink href={s.instagram} icon={<Instagram size={16} />} />}
+                {s.youtube && <SocialLink href={s.youtube} icon={<Youtube size={16} />} />}
+                {s.whatsapp && <SocialLink href={`https://wa.me/${s.whatsapp.replace(/\D/g, '')}`} icon={<WhatsAppIcon size={15} />} />}
               </div>
             </div>
 
@@ -117,10 +127,10 @@ export default function Footer({ site, footerPages }) {
               <h4 style={{ color: 'var(--color-primary)', fontWeight: 700, marginBottom: 16, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Contact</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {phones.map(p => (
-                  <a key={p} href={`tel:${p}`} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: 8 }}>📞 {p}</a>
+                  <a key={p} href={`tel:${p}`} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={15} style={{ flexShrink: 0 }} /> {p}</a>
                 ))}
-                {s.email && <a href={`mailto:${s.email}`} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: 8, wordBreak: 'break-all' }}>✉️ {s.email}</a>}
-                {s.address && <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.6)', display: 'flex', gap: 8 }}><span>📍</span><span>{s.address}</span></div>}
+                {s.email && <a href={`mailto:${s.email}`} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: 8, wordBreak: 'break-all' }}><Mail size={15} style={{ flexShrink: 0 }} /> {s.email}</a>}
+                {s.address && <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.6)', display: 'flex', gap: 8 }}><MapPin size={15} style={{ flexShrink: 0, marginTop: 2 }} /><span>{s.address}</span></div>}
               </div>
             </div>
           </div>
@@ -159,14 +169,14 @@ export default function Footer({ site, footerPages }) {
   );
 }
 
-function SocialLink({ href, label }) {
+function SocialLink({ href, icon }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" style={{
       width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: '0.78rem', fontWeight: 800, color: 'rgba(255,255,255,0.7)', transition: 'all 0.2s',
+      color: 'rgba(255,255,255,0.7)', transition: 'all 0.2s',
     }}
       onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-secondary)'; }}
       onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
-    >{label}</a>
+    >{icon}</a>
   );
 }
