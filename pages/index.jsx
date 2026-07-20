@@ -148,7 +148,7 @@ export default function Home({ featuredProducts, upcomingEvents, collageEvents, 
     .why-wave-cut { position: absolute; bottom: -1px; left: 0; width: 100%; height: 26px; }
 
     .why-badge {
-      position: absolute; left: 18px; bottom: -22px;
+      position: absolute; left: 18px; bottom: 0px;
       width: 44px; height: 44px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.15rem; color: #fff;

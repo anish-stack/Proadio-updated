@@ -1,29 +1,34 @@
+// components/HeroSection.js
 'use client';
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 
-const EVENT_CARDS = [
-  { icon: '💍', name: 'Wedding Setup',   sub: 'Sound + LED Wall',    pos: { top: '6%',    left: '4%'   }, dur: 4.2, delay: 0   },
-  { icon: '🎸', name: 'Live Concert',    sub: 'Line Array + Lights', pos: { top: '8%',    right: '5%'  }, dur: 3.8, delay: 0.7 },
-  { icon: '🏢', name: 'Corporate Event', sub: 'PA + Stage Setup',    pos: { bottom: '22%',left: '2%'   }, dur: 5.0, delay: 1.2 },
-  { icon: '🎓', name: 'College Fest',    sub: 'Full Rig Available',  pos: { bottom: '18%',right: '3%'  }, dur: 4.5, delay: 0.4 },
+const RING_CARDS = [
+  { icon: '💍', color: '#B24FE0', name: 'Wedding Setup',   sub: 'Sound + LED Wall',    pos: { top: '2%',   left: '30%' }, dur: 4.2, delay: 0   },
+  { icon: '🎸', color: '#E0475C', name: 'Live Concert',    sub: 'Line Array + Lights', pos: { top: '6%',   right: '0%' }, dur: 3.8, delay: 0.7 },
+  { icon: '🎛️', color: '#3D8BE0', name: 'Mixing Console',  sub: 'Digital Sound Control',pos: { top: '32%',  left: '-6%' }, dur: 5.0, delay: 1.2 },
+  { icon: '💡', color: '#E0B23D', name: 'Intelligent Lights', sub: 'Smart & Dynamic',  pos: { top: '35%',  right: '-6%' }, dur: 4.5, delay: 0.4 },
+  { icon: '🏢', color: '#3DBE8B', name: 'Corporate Event', sub: 'PA + Stage Setup',    pos: { top: '60%',  left: '-4%' }, dur: 5.5, delay: 0.3 },
+  { icon: '🎓', color: '#8B5CF6', name: 'College Fest',    sub: 'Full Rig Available',  pos: { top: '62%',  right: '-4%' }, dur: 4.8, delay: 1.0 },
+  { icon: '📺', color: '#4ADE80', name: 'LED Wall',        sub: 'HD Visuals',          pos: { bottom: '4%', left: '18%' }, dur: 5.2, delay: 0.6 },
+  { icon: '🏗️', color: '#E0475C', name: 'Trussing',        sub: 'Heavy Duty Setup',    pos: { bottom: '4%', right: '10%' }, dur: 4.0, delay: 1.4 },
 ];
 
-const GEAR_TAGS = [
-  { label: '🎛️ Mixing Console',    pos: { top: '36%',   left: '1%'    }, dur: 5.5, delay: 0.3 },
-  { label: '💡 Intelligent Lights', pos: { top: '32%',   right: '0%'   }, dur: 4.8, delay: 1.0 },
-  { label: '📺 LED Wall',           pos: { bottom: '8%', left: '18%'   }, dur: 5.2, delay: 0.6 },
-  { label: '🏗️ Trussing',          pos: { bottom: '8%', right: '16%'  }, dur: 4.0, delay: 1.4 },
+const FEATURE_STRIP = [
+  { icon: '👥', title: 'Expert Team',       sub: 'Certified Engineers' },
+  { icon: '🛡️', title: 'Top Quality Gear',  sub: 'Latest Technology'  },
+  { icon: '🕐', title: 'On Time Delivery',  sub: 'Always Reliable'    },
+  { icon: '🎧', title: '24×7 Support',      sub: "We're Always Here"  },
 ];
 
 export default function HeroSection({ site, stats }) {
   const s = site || {};
-  const heroSubtext = s.heroSubtext || 'From intimate weddings to stadium-scale concerts — professional PA systems, intelligent lighting, LED walls & trussing. Available 24×7 across Delhi NCR.';
+  const heroSubtext = s.heroSubtext || 'From intimate weddings to massive concerts — professional PA systems, intelligent lighting, LED walls & trussing. Available 24×7 across Delhi NCR.';
   const displayStats = stats?.length > 0 ? stats : [
-    { label: 'Events',     value: '600+' },
-    { label: 'Years Exp.', value: '20+'  },
-    { label: 'Available',  value: '24×7' },
-    { label: 'Brands',     value: '50+'  },
+    { label: 'Events Executed',    value: '600+', icon: '📅' },
+    { label: 'Years Experience',   value: '20+',  icon: '🎖️' },
+    { label: 'Availability',       value: '24×7', icon: '🎵' },
+    { label: 'Premium Brands',     value: '50+',  icon: '👑' },
   ];
 
   const beamRef    = useRef(null);
@@ -58,7 +63,6 @@ export default function HeroSection({ site, stats }) {
     resize();
     window.addEventListener('resize', resize);
 
-    /* spotlights */
     const spots = [
       { x: 0.12, color: 'rgba(0,180,255,',  speed: 0.38, angle: -0.10, swing: 0.22, phase: 0   },
       { x: 0.42, color: 'rgba(212,175,55,', speed: 0.25, angle:  0.04, swing: 0.18, phase: 2   },
@@ -90,7 +94,6 @@ export default function HeroSection({ site, stats }) {
     }
     drawBeams();
 
-    /* bottom waveform */
     const bands = Array.from({ length: 80 }, () => ({
       freq: 0.5 + Math.random() * 3, phase: Math.random() * Math.PI * 2, amp: 0.3 + Math.random() * 0.7,
     }));
@@ -112,7 +115,6 @@ export default function HeroSection({ site, stats }) {
     }
     drawWave();
 
-    /* orb waveform */
     const ob = Array.from({length:20},()=>({freq:.8+Math.random()*2,phase:Math.random()*Math.PI*2,amp:.4+Math.random()*.6}));
     let ot = 0;
     function drawOrbWave() {
@@ -125,7 +127,6 @@ export default function HeroSection({ site, stats }) {
     }
     drawOrbWave();
 
-    /* connecting lines */
     function drawLines() {
       const W=lCv.width, H=lCv.height;
       lCx.clearRect(0,0,W,H);
@@ -134,15 +135,14 @@ export default function HeroSection({ site, stats }) {
         const r=c.getBoundingClientRect(), vr=vw.getBoundingClientRect();
         const tx=r.left-vr.left+r.width/2, ty=r.top-vr.top+r.height/2;
         const g=lCx.createLinearGradient(cx,cy,tx,ty);
-        g.addColorStop(0,'rgba(212,175,55,0.25)'); g.addColorStop(1,'rgba(212,175,55,0.03)');
+        g.addColorStop(0,'rgba(212,175,55,0.3)'); g.addColorStop(1,'rgba(212,175,55,0.02)');
         lCx.beginPath(); lCx.moveTo(cx,cy); lCx.lineTo(tx,ty);
-        lCx.strokeStyle=g; lCx.lineWidth=0.8; lCx.setLineDash([3,7]); lCx.stroke(); lCx.setLineDash([]);
+        lCx.strokeStyle=g; lCx.lineWidth=0.8; lCx.setLineDash([3,6]); lCx.stroke(); lCx.setLineDash([]);
       });
       rafs.current[3] = requestAnimationFrame(drawLines);
     }
     drawLines();
 
-    /* EQ bars */
     const eq = eqRef.current;
     if (eq) {
       const barEls = [];
@@ -154,7 +154,6 @@ export default function HeroSection({ site, stats }) {
       intervals.current[0] = setInterval(()=>{barEls.forEach(b=>{b.style.height=(4+Math.random()*24)+'px';});},320);
     }
 
-    /* particles */
     const ptc = document.createElement('div');
     ptc.style.cssText='position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3';
     hero.appendChild(ptc);
@@ -184,139 +183,160 @@ export default function HeroSection({ site, stats }) {
         @keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
         @keyframes orbRing{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.9;transform:scale(1.04)}}
         @keyframes scrollHint{0%,100%{opacity:0;transform:scaleY(.5) translateY(-6px)}50%{opacity:1;transform:scaleY(1) translateY(0)}}
-        .hero-section{position:relative;overflow:hidden;min-height:92vh;display:flex;background:#04060D}
-        .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.75}
-        .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(4,6,13,.82) 0%,rgba(4,6,13,.62) 50%,rgba(4,6,13,.82) 100%);pointer-events:none}
+
+        .hero-section{position:relative;overflow:hidden;min-height:92vh;display:flex;flex-direction:column;background:#04060D}
+        .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.6}
+        .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(4,6,13,.88) 0%,rgba(4,6,13,.68) 50%,rgba(4,6,13,.88) 100%);pointer-events:none}
         .hero-canvas-beams{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
         .hero-canvas-wave{position:absolute;bottom:0;left:0;width:100%;height:90px;pointer-events:none;opacity:.3;z-index:2}
-        .hero-left{position:relative;z-index:10;display:flex;flex-direction:column;justify-content:center;width:52%;padding:clamp(48px,7vw,72px) clamp(20px,4vw,56px)}
-        .hero-right{position:relative;z-index:10;width:48%;display:flex;align-items:center;justify-content:center;padding:32px 32px 32px 0}
+
+        .hero-main{position:relative;z-index:10;flex:1;display:flex;padding:clamp(48px,6vw,64px) clamp(20px,4vw,56px) 0}
+        .hero-left{position:relative;z-index:10;display:flex;flex-direction:column;justify-content:center;width:50%}
+        .hero-right{position:relative;z-index:10;width:50%;display:flex;align-items:center;justify-content:center}
+
         .hero-badge{display:inline-flex;align-items:center;gap:7px;width:fit-content;margin-bottom:20px;padding:5px 13px;border-radius:100px;border:1px solid rgba(212,175,55,.35);background:rgba(212,175,55,.13);color:#D4AF37;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
         .hero-badge-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:heroPulse 1.8s ease-in-out infinite}
-        .hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,5.2vw,4.8rem);color:#fff;line-height:.95;letter-spacing:.01em;margin:0}
-        .hero-subtext{font-size:.88rem;color:rgba(255,255,255,.58);line-height:1.75;margin:16px 0 26px;max-width:420px}
-        .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:40px}
-        .hero-btn-main{display:inline-block;padding:12px 24px;border-radius:4px;background:#D4AF37;color:#04060D;font-weight:700;font-size:.78rem;letter-spacing:.07em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:background .2s,transform .15s}
+        .hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.6rem,4.8vw,4.4rem);color:#fff;line-height:.95;letter-spacing:.01em;margin:0}
+        .hero-subtext{font-size:.88rem;color:rgba(255,255,255,.58);line-height:1.75;margin:16px 0 6px;max-width:420px}
+        .hero-mini-eq{display:flex;align-items:center;gap:8px;margin-bottom:22px}
+        .hero-mini-eq span{width:16px;height:2px;background:#D4AF37;border-radius:1px}
+
+        .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:36px}
+        .hero-btn-main{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:6px;background:#D4AF37;color:#04060D;font-weight:700;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:background .2s,transform .15s;min-height:44px}
         .hero-btn-main:hover{background:#e8c84a;transform:translateY(-1px)}
-        .hero-btn-ghost{display:inline-block;padding:12px 24px;border-radius:4px;background:transparent;color:rgba(255,255,255,.85);font-weight:600;font-size:.78rem;letter-spacing:.07em;text-transform:uppercase;text-decoration:none;border:1.5px solid rgba(255,255,255,.22);cursor:pointer;transition:border-color .2s,background .2s}
+        .hero-btn-ghost{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:6px;background:transparent;color:rgba(255,255,255,.85);font-weight:600;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border:1.5px solid rgba(255,255,255,.22);cursor:pointer;transition:border-color .2s,background .2s;min-height:44px}
         .hero-btn-ghost:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.07)}
-        .hero-stats{display:flex;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:28px;gap:0}
-        .hero-stat{padding-right:24px;margin-right:24px;border-right:1px solid rgba(255,255,255,.08)}
-        .hero-stat:last-child{border-right:none;padding-right:0;margin-right:0}
-        .hero-stat-val{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;color:#D4AF37;line-height:1}
-        .hero-stat-lbl{font-size:.68rem;color:rgba(255,255,255,.42);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
-        .hero-viswrap{position:relative;width:100%;max-width:460px;height:460px}
+
+        .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:520px}
+        .hero-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 12px}
+        .hero-stat-icon{font-size:.9rem;margin-bottom:6px;display:block}
+        .hero-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:#D4AF37;line-height:1}
+        .hero-stat-lbl{font-size:.62rem;color:rgba(255,255,255,.42);letter-spacing:.06em;text-transform:uppercase;margin-top:3px;line-height:1.3}
+
+        .hero-viswrap{position:relative;width:100%;max-width:520px;height:480px}
         .hero-canvas-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
-        .hero-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 38% 38%,#1a0a00,#0a0a1a);border:1px solid rgba(212,175,55,.25);display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:5}
+        .hero-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 38% 38%,#1a0a00,#0a0a1a);border:1px solid rgba(212,175,55,.4);display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:5;box-shadow:0 0 40px -8px rgba(212,175,55,.4)}
         .hero-orb-inner{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center}
         .hero-orb-ring{position:absolute;border-radius:50%;animation:orbRing 3s ease-in-out infinite}
-        .hero-orb-icon{font-size:2.8rem;z-index:2;filter:drop-shadow(0 0 12px rgba(212,175,55,.5))}
+        .hero-orb-icon{font-size:2.6rem;z-index:2;filter:drop-shadow(0 0 12px rgba(212,175,55,.5))}
         .hero-canvas-orb{position:absolute;bottom:-2px;left:0;width:100%;height:44px;border-radius:0 0 80px 80px}
-        .hero-ev-card{position:absolute;display:flex;align-items:center;gap:9px;white-space:nowrap;border-radius:10px;padding:9px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:6;animation:floatCard ease-in-out infinite}
-        .hero-ev-icon{font-size:1.3rem}
-        .hero-ev-name{font-size:.75rem;font-weight:700;color:#fff;letter-spacing:.03em}
-        .hero-ev-sub{font-size:.62rem;color:rgba(255,255,255,.45);margin-top:1px}
-        .hero-gear-tag{position:absolute;border-radius:100px;padding:5px 12px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3);color:#D4AF37;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;z-index:6;animation:floatCard ease-in-out infinite}
-        .hero-eq-label{position:absolute;bottom:50px;right:28px;z-index:20;font-size:.65rem;font-weight:600;color:rgba(212,175,55,.45);letter-spacing:.14em;text-transform:uppercase}
-        .hero-eq-row{position:absolute;bottom:14px;right:28px;z-index:20;display:flex;align-items:flex-end;gap:3px;height:32px}
-        .hero-scroll{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:5px}
-        .hero-scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,rgba(212,175,55,.6),transparent);animation:scrollHint 1.6s ease-in-out infinite}
-        .hero-scroll-lbl{font-size:.62rem;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase}
-        @media(max-width:768px){
-          .hero-left{width:100% !important;padding:80px 24px 48px !important}
+
+        .hero-ring-card{position:absolute;display:flex;align-items:center;gap:10px;white-space:nowrap;border-radius:10px;padding:10px 14px;background:rgba(20,20,28,.75);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:6;animation:floatCard ease-in-out infinite}
+        .hero-ring-icon-box{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0}
+        .hero-ring-name{font-size:.76rem;font-weight:700;color:#fff;letter-spacing:.02em}
+        .hero-ring-sub{font-size:.63rem;color:rgba(255,255,255,.45);margin-top:1px}
+
+        .hero-feature-strip{position:relative;z-index:10;display:flex;flex-wrap:wrap;justify-content:center;gap:0;border-top:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.015);padding:20px clamp(20px,4vw,56px)}
+        .hero-feature{display:flex;align-items:center;gap:12px;padding:0 28px;flex:1;min-width:200px;justify-content:center;border-right:1px solid rgba(255,255,255,.08)}
+        .hero-feature:last-child{border-right:none}
+        .hero-feature-icon{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+        .hero-feature-title{color:#fff;font-size:.82rem;font-weight:700}
+        .hero-feature-sub{color:rgba(255,255,255,.42);font-size:.68rem;margin-top:1px}
+
+        .hero-eq-label{position:absolute;top:20px;right:28px;z-index:20;font-size:.65rem;font-weight:600;color:rgba(212,175,55,.45);letter-spacing:.14em;text-transform:uppercase}
+        .hero-eq-row{position:absolute;top:38px;right:28px;z-index:20;display:flex;align-items:flex-end;gap:3px;height:32px}
+
+        @media(max-width:1024px){
           .hero-right{display:none !important}
+          .hero-left{width:100% !important}
+        }
+        @media(max-width:768px){
+          .hero-main{padding:80px 20px 32px}
+          .hero-stats{grid-template-columns:repeat(2,1fr)}
+          .hero-feature-strip{flex-direction:column;gap:16px;padding:20px}
+          .hero-feature{border-right:none;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:16px;justify-content:flex-start;width:100%}
+          .hero-feature:last-child{border-bottom:none;padding-bottom:0}
+          .hero-eq-label,.hero-eq-row{display:none}
         }
       `}</style>
 
       <section className="hero-section">
 
-        {/* BG VIDEO */}
         <video autoPlay muted loop playsInline className="hero-video">
           <source src="/videos/hero-bg.mp4" type="video/mp4" />
         </video>
         <div className="hero-overlay" />
 
-        {/* CANVAS */}
         <canvas ref={beamRef} className="hero-canvas-beams" />
         <canvas ref={waveRef} className="hero-canvas-wave" />
 
-        {/* LEFT */}
-        <div className="hero-left">
-          <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            Delhi&apos;s Premier Sound &amp; Lighting Co.
-          </div>
-
-          <h1 className="hero-h1">
-            PREMIUM{' '}
-            <span style={{ WebkitTextStroke: '1.5px rgba(255,255,255,.35)', color: 'transparent' }}>SOUND</span>{' '}
-            <span style={{ color: '#D4AF37' }}>&amp;</span>
-            <br />LIGHTING
-          </h1>
-
-          <p className="hero-subtext">{heroSubtext}</p>
-
-          <div className="hero-ctas">
-            <Link href="/contact" className="hero-btn-main">Get Free Quote ↗</Link>
-            <Link href="/products" className="hero-btn-ghost">View Products</Link>
-          </div>
-
-          <div className="hero-stats">
-            {displayStats.map(st => (
-              <div key={st.label} className="hero-stat">
-                <div className="hero-stat-val">{st.value}</div>
-                <div className="hero-stat-lbl">{st.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* RIGHT */}
-        <div className="hero-right">
-          <div ref={viswrapRef} className="hero-viswrap">
-            <canvas ref={linesRef} className="hero-canvas-lines" />
-
-            {/* Orb */}
-            <div className="hero-orb">
-              <div className="hero-orb-inner">
-                {[['100%','rgba(212,175,55,.15)','0s'],['130%','rgba(0,180,255,.1)','0.8s'],['165%','rgba(180,0,255,.07)','1.6s']].map(([s,c,d],i) => (
-                  <span key={i} className="hero-orb-ring" style={{ width:s, height:s, border:`1px solid ${c}`, animationDelay:d }} />
-                ))}
-                <span className="hero-orb-icon">🔊</span>
-              </div>
-              <canvas ref={orbwRef} className="hero-canvas-orb" />
-            </div>
-
-            {/* Event cards */}
-            {EVENT_CARDS.map((c,i) => (
-              <div key={i} data-card className="hero-ev-card"
-                style={{ ...c.pos, animationDuration:`${c.dur}s`, animationDelay:`${c.delay}s` }}>
-                <span className="hero-ev-icon">{c.icon}</span>
-                <div>
-                  <div className="hero-ev-name">{c.name}</div>
-                  <div className="hero-ev-sub">{c.sub}</div>
-                </div>
-              </div>
-            ))}
-
-            {/* Gear tags */}
-            {GEAR_TAGS.map((g,i) => (
-              <div key={i} className="hero-gear-tag"
-                style={{ ...g.pos, animationDuration:`${g.dur}s`, animationDelay:`${g.delay}s` }}>
-                {g.label}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* EQ */}
         <div className="hero-eq-label">Live Audio Feed</div>
         <div ref={eqRef} className="hero-eq-row" />
 
-        {/* Scroll hint */}
-        <div className="hero-scroll">
-          <div className="hero-scroll-line" />
-          <span className="hero-scroll-lbl">Scroll</span>
+        <div className="hero-main">
+          {/* LEFT */}
+          <div className="hero-left">
+            <div className="hero-badge">
+              <span className="hero-badge-dot" />
+              Delhi&apos;s Premier Sound &amp; Lighting Co.
+            </div>
+
+            <h1 className="hero-h1">
+              PREMIUM{' '}
+              <span style={{ WebkitTextStroke: '1.5px rgba(255,255,255,.35)', color: 'transparent' }}>SOUND</span>{' '}
+              <span style={{ color: '#D4AF37' }}>&amp;</span>
+              <br />LIGHTING
+            </h1>
+
+            <p className="hero-subtext">{heroSubtext}</p>
+            <div className="hero-mini-eq"><span /><span style={{ background: '#D4AF37', opacity: 0.6 }} /></div>
+
+            <div className="hero-ctas">
+              <Link href="/contact" className="hero-btn-main">Get Free Quote →</Link>
+              <Link href="/products" className="hero-btn-ghost">📷 View Products</Link>
+            </div>
+
+            <div className="hero-stats">
+              {displayStats.map(st => (
+                <div key={st.label} className="hero-stat">
+                  {st.icon && <span className="hero-stat-icon">{st.icon}</span>}
+                  <div className="hero-stat-val">{st.value}</div>
+                  <div className="hero-stat-lbl">{st.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT */}
+          <div className="hero-right">
+            <div ref={viswrapRef} className="hero-viswrap">
+              <canvas ref={linesRef} className="hero-canvas-lines" />
+
+              <div className="hero-orb">
+                <div className="hero-orb-inner">
+                  {[['100%','rgba(212,175,55,.15)','0s'],['130%','rgba(0,180,255,.1)','0.8s'],['165%','rgba(180,0,255,.07)','1.6s']].map(([sz,c,d],i) => (
+                    <span key={i} className="hero-orb-ring" style={{ width:sz, height:sz, border:`1px solid ${c}`, animationDelay:d }} />
+                  ))}
+                  <span className="hero-orb-icon">🔊</span>
+                </div>
+                <canvas ref={orbwRef} className="hero-canvas-orb" />
+              </div>
+
+              {RING_CARDS.map((c,i) => (
+                <div key={i} data-card className="hero-ring-card"
+                  style={{ ...c.pos, animationDuration:`${c.dur}s`, animationDelay:`${c.delay}s` }}>
+                  <span className="hero-ring-icon-box" style={{ background: `${c.color}22`, color: c.color, border: `1px solid ${c.color}55` }}>{c.icon}</span>
+                  <div>
+                    <div className="hero-ring-name">{c.name}</div>
+                    <div className="hero-ring-sub">{c.sub}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* BOTTOM FEATURE STRIP */}
+        <div className="hero-feature-strip">
+          {FEATURE_STRIP.map(f => (
+            <div key={f.title} className="hero-feature">
+              <span className="hero-feature-icon">{f.icon}</span>
+              <div>
+                <div className="hero-feature-title">{f.title}</div>
+                <div className="hero-feature-sub">{f.sub}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </>
