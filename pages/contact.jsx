@@ -5,7 +5,7 @@ import { getCommonProps } from '../lib/pageProps';
 
 export default function ContactPage({ site, footerPages }) {
   const s = site || {};
-  const phones = [s.phone1, s.phone2, s.phone3].filter(Boolean);
+  const phones = [s.phone2, s.phone3].filter(Boolean);
   const [form, setForm] = useState({ name:'', email:'', phone:'', subject:'', message:'' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,7 @@ export default function ContactPage({ site, footerPages }) {
 
   return (
     <Layout site={s} footerPages={footerPages} title="Contact Us"
-      description={`Contact ${s.name||'Pro Audio Solution'} Delhi — get a free quote for PA systems, lighting, LED walls & event production. Call ${s.phone1||'9810240284'}.`}
+      description={`Contact ${s.name||'Pro Audio Solution'} Delhi — get a free quote for PA systems, lighting, LED walls & event production. Call ${s.phone2||'9810257891'}.`}
     >
       {toast && <Toast {...toast} onClose={()=>setToast(null)} />}
 

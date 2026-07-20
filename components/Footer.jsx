@@ -108,7 +108,7 @@ export default function Footer({ site, footerPages }) {
             </div>
             {/* Services */}
             <div>
-              <h4 style={{ color: 'var(--color-primary)', fontWeight: 700, marginBottom: 16, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Services</h4>
+              <h4 style={{ color: 'var(--color-primary)', fontWeight: 700, marginBottom: 16, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Policy</h4>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {Policy.map(svc => (
                   <li key={svc.slug}>
